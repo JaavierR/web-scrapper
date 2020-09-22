@@ -1,11 +1,60 @@
-import time
-import csv
+from time import sleep
 
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
 
-# PATH = "D:\webdrivers\geckodriver.exe"
+
+def complete_form(
+    first_name="test5",
+    last_name="test4",
+    contact_email="test@test.com",
+    phone_number="",
+    question="some question",
+):
+
+    input_first_name = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.NAME, "firstName"))
+    )
+    input_first_name.send_keys(first_name)
+
+    input_last_name = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.NAME, "lastName"))
+    )
+    input_last_name.send_keys(last_name)
+
+    input_contact_email = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.NAME, "contactEmail"))
+    )
+    input_contact_email.send_keys(contact_email)
+
+    input_phone_number = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.NAME, "phoneNumber"))
+    )
+    input_phone_number.send_keys(phone_number)
+
+    input_question = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.NAME, "question"))
+    )
+    input_question.send_keys(question)
+
+    asking_button = WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located(
+            (By.XPATH, "//form//input[@type='submit' and @value='Preguntar']")
+        )
+    )
+    asking_button.click()
+
+    sleep(10)
+
+
 PATH = "D:\webdrivers\chromedriver.exe"
+OPTS = Options()
+OPTS.add_argument(
+    "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36"
+)
 
 AUTOS = "https://autos.mercadolibre.cl"
 REGION = "rm-metropolitana"
@@ -30,50 +79,60 @@ DIVISOR = "/"
 #     int(input("\nSeleccione el numero de la comuna con la cual desea trabajar: ")) - 1
 # )
 
-full_path = (
-    AUTOS
-    + DIVISOR
-    + REGION
-    + DIVISOR
-    + COMUNA[idx_comuna]
-    + DIVISOR
-    + TRATO
-    + DIVISOR
-    + PRECIO
-)
+# full_path = (
+#     AUTOS
+#     + DIVISOR
+#     + REGION
+#     + DIVISOR
+#     + COMUNA[idx_comuna]
+#     + DIVISOR
+#     + TRATO
+#     + DIVISOR
+#     + PRECIO
+# )
 
-driver = webdriver.Chrome(executable_path=PATH)
+driver = webdriver.Chrome(executable_path=PATH, chrome_options=OPTS)
 # driver.get(full_path)
+driver.get(
+    "https://vehiculo.mercadolibre.cl/MLC-542125151-triciclo-electrico-_JM#position=3&type=item&tracking_id=0e447cae-16ae-4dd9-9abf-f875e1c99753"
+)
 
 # links = [
 #     x.get_attribute("href")
 #     for x in driver.find_elements_by_xpath("//*[contains(@class, 'andes-card')]/a")
 # ]
 
-# with open("test.csv", "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(links)
+try:
+    complete_form(
+        first_name="Pedro",
+        last_name="Pablo",
+        contact_email="pedro@testeo.com",
+        question="test2 jaolsa",
+    )
 
+    # driver.find_element_by_xpath(
+    #     "//input[@type='submit' and @value='Preguntar']"
+    # ).click()
 
-# first_name = driver.find_element_by_name("firstName")
-# first_name.send_keys("Catalina")
+    driver.refresh()
 
-# last_name = driver.find_element_by_name("lastName")
-# last_name.send_keys("Puerta")
+    sleep(4)
 
-# contact_email = driver.find_element_by_name("contactEmail")
-# contact_email.send_keys("contacto@prueba.cl")
+    complete_form(
+        first_name="Pedro",
+        last_name="Pablo",
+        contact_email="pedro@testeo.com",
+        question="test2 jaolsa",
+    )
 
-# phone_number = driver.find_element_by_name("phoneNumber")
-# phone_number.send_keys("+56 9 5123 4984")
+    sleep(3)
 
-# question = driver.find_element_by_name("question")
-# question.send_keys("Hola soy margarita de los rios")
-time.sleep(5)
+    # driver.find_element_by_xpath(
+    #     "//input[@type='submit' and @value='Preguntar']"
+    # ).click()
 
-driver.find_element_by_xpath("//input[@type='submit' and @value='Preguntar']").submit()
-
-time.sleep(10)
+except Exception as e:
+    break
 
 # htmls = []
 
@@ -82,6 +141,8 @@ time.sleep(10)
 #     # driver.get(link)
 #     # htmls.append(driver.page_source)
 
-driver.quit()
+# driver.quit()
 
-# Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+# with open("test.csv", "w", newline="") as f:
+#     writer = csv.writer(f)
+#     writer.writerow(links)

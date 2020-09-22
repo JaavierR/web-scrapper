@@ -1,4 +1,5 @@
 # Folder venv
+.vscode/
 venv/
 # Different type files
 *.csv
