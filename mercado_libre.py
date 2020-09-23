@@ -100,14 +100,13 @@ links = [
     for x in driver.find_elements_by_xpath("//*[contains(@class, 'andes-card')]/a")
 ]
 
-count = 1
-
-for link in links:
+for idx, link in enumerate(links):
+    # This if is only for testing
     if count != 3:
         try:
             driver.get(link)
 
-            if count == 1:
+            if idx == 0:
                 complete_form(
                     first_name="Pedro",
                     last_name="Pablo",
@@ -143,8 +142,6 @@ for link in links:
                 driver.back()
                 print("Done")
                 sleep(5)
-
-            count += 1
 
             sleep(3)
 
