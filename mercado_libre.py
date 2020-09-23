@@ -93,46 +93,66 @@ DIVISOR = "/"
 
 driver = webdriver.Chrome(executable_path=PATH, chrome_options=OPTS)
 # driver.get(full_path)
-driver.get(
-    "https://vehiculo.mercadolibre.cl/MLC-542125151-triciclo-electrico-_JM#position=3&type=item&tracking_id=0e447cae-16ae-4dd9-9abf-f875e1c99753"
-)
+driver.get("https://vehiculos.mercadolibre.cl/otros/la-araucania/")
 
-# links = [
-#     x.get_attribute("href")
-#     for x in driver.find_elements_by_xpath("//*[contains(@class, 'andes-card')]/a")
-# ]
+links = [
+    x.get_attribute("href")
+    for x in driver.find_elements_by_xpath("//*[contains(@class, 'andes-card')]/a")
+]
 
-try:
-    complete_form(
-        first_name="Pedro",
-        last_name="Pablo",
-        contact_email="pedro@testeo.com",
-        question="test2 jaolsa",
-    )
+count = 1
 
-    # driver.find_element_by_xpath(
-    #     "//input[@type='submit' and @value='Preguntar']"
-    # ).click()
+for link in links:
+    if count != 3:
+        try:
+            driver.get(link)
 
-    driver.refresh()
+            if count == 1:
+                complete_form(
+                    first_name="Pedro",
+                    last_name="Pablo",
+                    contact_email="pedro@testeo.com",
+                    question="test2 jaolsa",
+                )
 
-    sleep(4)
+                driver.refresh()
 
-    complete_form(
-        first_name="Pedro",
-        last_name="Pablo",
-        contact_email="pedro@testeo.com",
-        question="test2 jaolsa",
-    )
+                sleep(2)
 
-    sleep(3)
+                complete_form(
+                    first_name="Pedro",
+                    last_name="Pablo",
+                    contact_email="pedro@testeo.com",
+                    question="test2 jaolsa",
+                )
+                driver.back()
+                driver.back()
+            else:
+                asking_button = WebDriverWait(driver, 30).until(
+                    EC.presence_of_element_located(
+                        (
+                            By.XPATH,
+                            "//form//input[@type='submit' and @value='Preguntar']",
+                        )
+                    )
+                )
+                asking_button.click()
 
-    # driver.find_element_by_xpath(
-    #     "//input[@type='submit' and @value='Preguntar']"
-    # ).click()
+                sleep(10)
 
-except Exception as e:
-    break
+                driver.back()
+                print("Done")
+                sleep(5)
+
+            count += 1
+
+            sleep(3)
+
+        except Exception as e:
+            break
+    else:
+        print("Done")
+        break
 
 # htmls = []
 
