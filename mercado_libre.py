@@ -50,46 +50,49 @@ def complete_form(
     sleep(10)
 
 
+def menu():
+    AUTOS = "https://autos.mercadolibre.cl"
+    REGION = "rm-metropolitana"
+    COMUNA = [
+        "las-condes",
+        "vitacura",
+        "nunoa",
+        "providencia",
+        "huechuraba",
+        "colina",
+        "lo-barnechea",
+        "la-reina",
+    ]
+    TRATO = "trato-directo"
+    PRECIO = "_PriceRange_4000000-0"
+    DIVISOR = "/"
+
+    for idx, comuna in enumerate(COMUNA):
+        print(str(idx + 1), comuna)
+
+    idx_comuna = (
+        int(input("\nSeleccione el numero de la comuna con la cual desea trabajar: "))
+        - 1
+    )
+
+    full_path = (
+        AUTOS
+        + DIVISOR
+        + REGION
+        + DIVISOR
+        + COMUNA[idx_comuna]
+        + DIVISOR
+        + TRATO
+        + DIVISOR
+        + PRECIO
+    )
+
+
 PATH = "D:\webdrivers\chromedriver.exe"
 OPTS = Options()
 OPTS.add_argument(
     "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36"
 )
-
-AUTOS = "https://autos.mercadolibre.cl"
-REGION = "rm-metropolitana"
-COMUNA = [
-    "las-condes",
-    "vitacura",
-    "nunoa",
-    "providencia",
-    "huechuraba",
-    "colina",
-    "lo-barnechea",
-    "la-reina",
-]
-TRATO = "trato-directo"
-PRECIO = "_PriceRange_4000000-0"
-DIVISOR = "/"
-
-# for idx, comuna in enumerate(COMUNA):
-#     print(str(idx + 1), comuna)
-
-# idx_comuna = (
-#     int(input("\nSeleccione el numero de la comuna con la cual desea trabajar: ")) - 1
-# )
-
-# full_path = (
-#     AUTOS
-#     + DIVISOR
-#     + REGION
-#     + DIVISOR
-#     + COMUNA[idx_comuna]
-#     + DIVISOR
-#     + TRATO
-#     + DIVISOR
-#     + PRECIO
-# )
 
 driver = webdriver.Chrome(executable_path=PATH, chrome_options=OPTS)
 # driver.get(full_path)
