@@ -1,158 +1,274 @@
+"""Bot to automate form submits in the vehicule page og MercadoLibre."""
+
 from time import sleep
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.options import Options
 
 
-def complete_form(
-    first_name="test5",
-    last_name="test4",
-    contact_email="test@test.com",
-    phone_number="",
-    question="some question",
-):
+class AutoForm:
+    """This is a class to autoexecute the bot for MeracadoLibre."""
 
-    input_first_name = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "firstName"))
-    )
-    input_first_name.send_keys(first_name)
+    def __init__(
+        self,
+        driver,
+        first_name,
+        last_name,
+        contact_email,
+        phone_number,
+        question,
+        full_path,
+    ):
+        """Constructor for the AutoForm.
 
-    input_last_name = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "lastName"))
-    )
-    input_last_name.send_keys(last_name)
+        Args:
+            driver (selenium object): Driver to execute the web browser.
+            first_name (string): First name of the person.
+            last_name (string): Last name of the person.
+            contact_email (string): Contact email to the form test@test.com.
+            phone_number (int, optional): Phone Number that it's optional.
+            question (string): Text with the info to the contact.
+            full_path (string): Path to the webpage that contains the products.
+        """
+        self.driver = driver
+        self.first_name = first_name
+        self.last_name = last_name
+        self.contact_email = contact_email
+        self.phone_number = phone_number
+        self.question = question
+        self.full_path = full_path
 
-    input_contact_email = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "contactEmail"))
-    )
-    input_contact_email.send_keys(contact_email)
-
-    input_phone_number = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "phoneNumber"))
-    )
-    input_phone_number.send_keys(phone_number)
-
-    input_question = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "question"))
-    )
-    input_question.send_keys(question)
-
-    asking_button = WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located(
-            (By.XPATH, "//form//input[@type='submit' and @value='Preguntar']")
+    def autocomplete_input_form_by_name(self, wait_time, element_name, contact_info):
+        input_form = WebDriverWait(self.driver, wait_time).until(
+            EC.presence_of_element_located((By.NAME, element_name))
         )
-    )
-    asking_button.click()
+        input_form.send_keys(contact_info)
 
-    sleep(10)
+    def click_submit_button(self, wait_time, element_xpath, sleep_time):
+        button = WebDriverWait(self.driver, wait_time).until(
+            EC.presence_of_element_located((By.XPATH, element_xpath))
+        )
+        button.click()
+        sleep(sleep_time)
+
+    def autocomplete_form(self):
+        self.autocomplete_input_form_by_name(10, "firstName", self.first_name)
+        self.autocomplete_input_form_by_name(10, "lastName", self.last_name)
+        self.autocomplete_input_form_by_name(10, "contactEmail", self.contact_email)
+        self.autocomplete_input_form_by_name(10, "phoneNumber", self.phone_number)
+        self.autocomplete_input_form_by_name(10, "question", self.question)
+
+        self.click_submit_button(
+            20, "//form//input[@type='submit' and @value='Preguntar']", 10
+        )
+
+        sleep(10)
+
+    def get_links(self):
+        return [
+            x.get_attribute("href")
+            for x in driver.find_elements_by_xpath(
+                "//*[contains(@class, 'andes-card')]/a"
+            )
+        ]
+
+    def send_multiple_forms(self):
+        self.driver.get(self.full_path)
+        links = self.get_links()
+
+        for idx, link in enumerate(links):
+            try:
+                self.driver.get(link)
+                if idx == 0:
+                    self.autocomplete_form()
+
+                    self.driver.refresh()
+
+                    sleep(2)
+
+                    self.autocomplete_form()
+                    self.driver.back()
+                    self.driver.back()
+                elif idx == 1:
+                    self.click_submit_button(
+                        30, "//form//input[@type='submit' and @value='Preguntar']", 10
+                    )
+
+                    self.driver.back()
+                    print("Done")
+                    sleep(5)
+                else:
+                    driver.quit()
+            except Exception as e:
+                print(e)
+                break
 
 
-def menu():
-    AUTOS = "https://autos.mercadolibre.cl"
-    REGION = "rm-metropolitana"
-    COMUNA = [
-        "las-condes",
-        "vitacura",
-        "nunoa",
-        "providencia",
-        "huechuraba",
-        "colina",
-        "lo-barnechea",
-        "la-reina",
-    ]
-    TRATO = "trato-directo"
-    PRECIO = "_PriceRange_4000000-0"
-    DIVISOR = "/"
-
-    for idx, comuna in enumerate(COMUNA):
-        print(str(idx + 1), comuna)
-
-    idx_comuna = (
-        int(input("\nSeleccione el numero de la comuna con la cual desea trabajar: "))
-        - 1
-    )
-
-    full_path = (
-        AUTOS
-        + DIVISOR
-        + REGION
-        + DIVISOR
-        + COMUNA[idx_comuna]
-        + DIVISOR
-        + TRATO
-        + DIVISOR
-        + PRECIO
-    )
-
-
-PATH = "D:\webdrivers\chromedriver.exe"
+# Settings for the Selenium Driver in Chrome.
+PATH = "./chromedriver.exe"
 OPTS = Options()
 OPTS.add_argument(
     "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36"
 )
-
 driver = webdriver.Chrome(executable_path=PATH, chrome_options=OPTS)
-# driver.get(full_path)
-driver.get("https://vehiculos.mercadolibre.cl/otros/la-araucania/")
 
-links = [
-    x.get_attribute("href")
-    for x in driver.find_elements_by_xpath("//*[contains(@class, 'andes-card')]/a")
-]
+# Global variables.
+VEHICULES = "https://vehiculos.mercadolibre.cl/"
+MOTORCYCLES = "https://motos.mercadolibre.cl/"
 
-for idx, link in enumerate(links):
-    # This if is only for testing
-    if count != 3:
-        try:
-            driver.get(link)
+# driver.get("https://vehiculos.mercadolibre.cl/otros/la-araucania/")
 
-            if idx == 0:
-                complete_form(
-                    first_name="Pedro",
-                    last_name="Pablo",
-                    contact_email="pedro@testeo.com",
-                    question="test2 jaolsa",
-                )
+test = AutoForm(
+    driver,
+    "Pedro",
+    "Pablo",
+    "test@test.cl",
+    "756324456",
+    "This is a test",
+    "https://vehiculos.mercadolibre.cl/otros/la-araucania/",
+)
+test.send_multiple_forms()
 
-                driver.refresh()
+# for idx, link in enumerate(links):
+#     # This if is only for testing
+#     if count != 3:
+#         try:
+#             driver.get(link)
 
-                sleep(2)
+#             if idx == 0:
+#                 complete_form(
+#                     first_name="Pedro",
+#                     last_name="Pablo",
+#                     contact_email="pedro@testeo.com",
+#                     question="test2 jaolsa",
+#                 )
 
-                complete_form(
-                    first_name="Pedro",
-                    last_name="Pablo",
-                    contact_email="pedro@testeo.com",
-                    question="test2 jaolsa",
-                )
-                driver.back()
-                driver.back()
-            else:
-                asking_button = WebDriverWait(driver, 30).until(
-                    EC.presence_of_element_located(
-                        (
-                            By.XPATH,
-                            "//form//input[@type='submit' and @value='Preguntar']",
-                        )
-                    )
-                )
-                asking_button.click()
+#                 driver.refresh()
 
-                sleep(10)
+#                 sleep(2)
 
-                driver.back()
-                print("Done")
-                sleep(5)
+#                 complete_form(
+#                     first_name="Pedro",
+#                     last_name="Pablo",
+#                     contact_email="pedro@testeo.com",
+#                     question="test2 jaolsa",
+#                 )
+#                 driver.back()
+#                 driver.back()
+#             else:
+#                 asking_button = WebDriverWait(driver, 30).until(
+#                     EC.presence_of_element_located(
+#                         (
+#                             By.XPATH,
+#                             "//form//input[@type='submit' and @value='Preguntar']",
+#                         )
+#                     )
+#                 )
+#                 asking_button.click()
 
-            sleep(3)
+#                 sleep(10)
 
-        except Exception as e:
-            break
-    else:
-        print("Done")
-        break
+#                 driver.back()
+#                 print("Done")
+#                 sleep(5)
+
+#             sleep(3)
+
+#         except Exception as e:
+#             break
+#     else:
+#         print("Done")
+#         break
+# def complete_form(
+#     first_name="test5",
+#     last_name="test4",
+#     contact_email="test@test.com",
+#     phone_number="",
+#     question="some question",
+# ):
+#     """Autocomplete the form in the vehicule page.
+
+#     Args:
+#         first_name (str, optional): [description]. Defaults to "test5".
+#         last_name (str, optional): [description]. Defaults to "test4".
+#         contact_email (str, optional): [description]. Defaults to "test@test.com".
+#         phone_number (str, optional): [description]. Defaults to "".
+#         question (str, optional): [description]. Defaults to "some question".
+#     """
+#     input_first_name = WebDriverWait(driver, 10).until(
+#         EC.presence_of_element_located((By.NAME, "firstName"))
+#     )
+#     input_first_name.send_keys(first_name)
+
+#     input_last_name = WebDriverWait(driver, 10).until(
+#         EC.presence_of_element_located((By.NAME, "lastName"))
+#     )
+#     input_last_name.send_keys(last_name)
+
+#     input_contact_email = WebDriverWait(driver, 10).until(
+#         EC.presence_of_element_located((By.NAME, "contactEmail"))
+#     )
+#     input_contact_email.send_keys(contact_email)
+
+#     input_phone_number = WebDriverWait(driver, 10).until(
+#         EC.presence_of_element_located((By.NAME, "phoneNumber"))
+#     )
+#     input_phone_number.send_keys(phone_number)
+
+#     input_question = WebDriverWait(driver, 10).until(
+#         EC.presence_of_element_located((By.NAME, "question"))
+#     )
+#     input_question.send_keys(question)
+
+#     asking_button = WebDriverWait(driver, 20).until(
+#         EC.presence_of_element_located(
+#             (By.XPATH, "//form//input[@type='submit' and @value='Preguntar']")
+#         )
+#     )
+#     asking_button.click()
+
+#     sleep(10)
+
+
+# def menu():
+#     AUTOS = "https://autos.mercadolibre.cl"
+#     REGION = "rm-metropolitana"
+#     COMUNA = [
+#         "las-condes",
+#         "vitacura",
+#         "nunoa",
+#         "providencia",
+#         "huechuraba",
+#         "colina",
+#         "lo-barnechea",
+#         "la-reina",
+#     ]
+#     TRATO = "trato-directo"
+#     PRECIO = "_PriceRange_4000000-0"
+#     DIVISOR = "/"
+
+#     for idx, comuna in enumerate(COMUNA):
+#         print(str(idx + 1), comuna)
+
+#     idx_comuna = (
+#         int(input("\nSeleccione el numero de la comuna con la cual desea trabajar: "))
+#         - 1
+#     )
+
+#     full_path = (
+#         AUTOS
+#         + DIVISOR
+#         + REGION
+#         + DIVISOR
+#         + COMUNA[idx_comuna]
+#         + DIVISOR
+#         + TRATO
+#         + DIVISOR
+#         + PRECIO
+#     )
 
 # htmls = []
 
