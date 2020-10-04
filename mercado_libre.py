@@ -1,6 +1,7 @@
 """Bot to automate form submits in the vehicule page og MercadoLibre."""
 
 from time import sleep
+from random import randint
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -14,7 +15,6 @@ class AutoForm:
 
     def __init__(
         self,
-        driver,
         first_name,
         last_name,
         contact_email,
@@ -33,7 +33,17 @@ class AutoForm:
             question (string): Text with the info to the contact.
             full_path (string): Path to the webpage that contains the products.
         """
-        self.driver = driver
+
+        self.path = "./chromedriver.exe"
+        self.opts = Options()
+        self.opts.add_argument(
+            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36"
+        )
+        self.driver = webdriver.Chrome(
+            executable_path=self.path,
+            options=self.opts,
+        )
+
         self.first_name = first_name
         self.last_name = last_name
         self.contact_email = contact_email
@@ -65,15 +75,16 @@ class AutoForm:
             20, "//form//input[@type='submit' and @value='Preguntar']", 10
         )
 
-        sleep(10)
-
     def get_links(self):
         return [
             x.get_attribute("href")
-            for x in driver.find_elements_by_xpath(
+            for x in self.driver.find_elements_by_xpath(
                 "//*[contains(@class, 'andes-card')]/a"
             )
         ]
+
+    def access_page(self):
+        self.driver.get(self.full_path)
 
     def send_multiple_forms(self):
         self.driver.get(self.full_path)
@@ -87,50 +98,125 @@ class AutoForm:
 
                     self.driver.refresh()
 
-                    sleep(2)
+                    sleep(randint(1, 3))
 
                     self.autocomplete_form()
                     self.driver.back()
                     self.driver.back()
                 elif idx == 1:
                     self.click_submit_button(
-                        30, "//form//input[@type='submit' and @value='Preguntar']", 10
+                        30,
+                        "//form//input[@type='submit' and @value='Preguntar']",
+                        randint(3, 10),
                     )
 
                     self.driver.back()
                     print("Done")
-                    sleep(5)
+                    sleep(randint(4, 7))
                 else:
-                    driver.quit()
+                    self.driver.quit()
             except Exception as e:
                 print(e)
                 break
 
+        self.driver.quit()
 
-# Settings for the Selenium Driver in Chrome.
-PATH = "./chromedriver.exe"
-OPTS = Options()
-OPTS.add_argument(
-    "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36"
-)
-driver = webdriver.Chrome(executable_path=PATH, chrome_options=OPTS)
 
-# Global variables.
-VEHICULES = "https://vehiculos.mercadolibre.cl/"
-MOTORCYCLES = "https://motos.mercadolibre.cl/"
+def menu():
+    """Generate a menu to config the path to the webpage.
 
-# driver.get("https://vehiculos.mercadolibre.cl/otros/la-araucania/")
+    Returns:
+        weblink (str): The link to access the main page of the products by a certain
+        criteria.
+    """
+    paginas = {
+        "Autos": "https://autos.mercadolibre.cl",
+        "Motos": "https://motos.mercadolibre.cl",
+    }
+    region = "rm-metropolitana"
+    comunas = [
+        "las-condes",
+        "vitacura",
+        "nunoa",
+        "providencia",
+        "huechuraba",
+        "colina",
+        "lo-barnechea",
+        "la-reina",
+    ]
+    trato = "trato-directo"
+    precio = "_PriceRange_4000000-0"
+    divisor = "/"
 
+    for idx, comuna in enumerate(comunas):
+        print(str(idx + 1), comuna)
+
+    idx_comuna = (
+        int(input("\nSeleccione el numero de la comuna con la cual desea trabajar: "))
+        - 1
+    )
+
+    for idx, pagina in enumerate(list(paginas)):
+        print(str(idx + 1), pagina)
+
+    idx_pagina = (
+        int(input("\nSeleccione el numero de la opción con la cual desea trabajar: "))
+        - 1
+    )
+
+    tipo_vehiculo = list(paginas)[idx_pagina]
+
+    if tipo_vehiculo == "Autos":
+        main_link = paginas[tipo_vehiculo]
+        page_link = (
+            main_link
+            + divisor
+            + region
+            + divisor
+            + comunas[idx_comuna]
+            + divisor
+            + trato
+            + divisor
+            + precio
+        )
+    elif tipo_vehiculo == "Motos":
+        main_link = paginas[tipo_vehiculo]
+        page_link = (
+            main_link
+            + divisor
+            + region
+            + divisor
+            + comunas[idx_comuna]
+            + divisor
+            + trato
+            + divisor
+        )
+
+    return page_link
+
+
+path = menu()
 test = AutoForm(
-    driver,
     "Pedro",
     "Pablo",
     "test@test.cl",
     "756324456",
     "This is a test",
-    "https://vehiculos.mercadolibre.cl/otros/la-araucania/",
+    path,
+    # "https://vehiculos.mercadolibre.cl/otros/la-araucania/",
 )
-test.send_multiple_forms()
+
+test.access_page()
+# test = AutoForm(
+#     driver,
+#     "Pedro",
+#     "Pablo",
+#     "test@test.cl",
+#     "756324456",
+#     "This is a test",
+#     "https://vehiculos.mercadolibre.cl/otros/la-araucania/",
+# )
+# test.send_multiple_forms()
 
 # for idx, link in enumerate(links):
 #     # This if is only for testing
@@ -231,44 +317,6 @@ test.send_multiple_forms()
 #     asking_button.click()
 
 #     sleep(10)
-
-
-# def menu():
-#     AUTOS = "https://autos.mercadolibre.cl"
-#     REGION = "rm-metropolitana"
-#     COMUNA = [
-#         "las-condes",
-#         "vitacura",
-#         "nunoa",
-#         "providencia",
-#         "huechuraba",
-#         "colina",
-#         "lo-barnechea",
-#         "la-reina",
-#     ]
-#     TRATO = "trato-directo"
-#     PRECIO = "_PriceRange_4000000-0"
-#     DIVISOR = "/"
-
-#     for idx, comuna in enumerate(COMUNA):
-#         print(str(idx + 1), comuna)
-
-#     idx_comuna = (
-#         int(input("\nSeleccione el numero de la comuna con la cual desea trabajar: "))
-#         - 1
-#     )
-
-#     full_path = (
-#         AUTOS
-#         + DIVISOR
-#         + REGION
-#         + DIVISOR
-#         + COMUNA[idx_comuna]
-#         + DIVISOR
-#         + TRATO
-#         + DIVISOR
-#         + PRECIO
-#     )
 
 # htmls = []
 
