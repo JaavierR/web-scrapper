@@ -87,7 +87,7 @@ class AutoForm:
         self.driver.get(self.full_path)
 
     def send_multiple_forms(self):
-        self.driver.get(self.full_path)
+        self.access_page()
         links = self.get_links()
 
         for idx, link in enumerate(links):
@@ -98,12 +98,12 @@ class AutoForm:
 
                     self.driver.refresh()
 
-                    sleep(randint(1, 3))
+                    sleep(randint(3, 5))
 
                     self.autocomplete_form()
                     self.driver.back()
                     self.driver.back()
-                elif idx == 1:
+                else:
                     self.click_submit_button(
                         30,
                         "//form//input[@type='submit' and @value='Preguntar']",
@@ -113,8 +113,6 @@ class AutoForm:
                     self.driver.back()
                     print("Done")
                     sleep(randint(4, 7))
-                else:
-                    self.driver.quit()
             except Exception as e:
                 print(e)
                 break
@@ -196,127 +194,17 @@ def menu():
 
 
 path = menu()
-test = AutoForm(
-    "Pedro",
-    "Pablo",
-    "test@test.cl",
-    "756324456",
-    "This is a test",
+form_ml = AutoForm(
+    "Komakii",
+    "Koma",
+    "komakei17@gmail.com",
+    "",
+    "Komakii store",
     path,
     # "https://vehiculos.mercadolibre.cl/otros/la-araucania/",
 )
 
-test.access_page()
-# test = AutoForm(
-#     driver,
-#     "Pedro",
-#     "Pablo",
-#     "test@test.cl",
-#     "756324456",
-#     "This is a test",
-#     "https://vehiculos.mercadolibre.cl/otros/la-araucania/",
-# )
-# test.send_multiple_forms()
-
-# for idx, link in enumerate(links):
-#     # This if is only for testing
-#     if count != 3:
-#         try:
-#             driver.get(link)
-
-#             if idx == 0:
-#                 complete_form(
-#                     first_name="Pedro",
-#                     last_name="Pablo",
-#                     contact_email="pedro@testeo.com",
-#                     question="test2 jaolsa",
-#                 )
-
-#                 driver.refresh()
-
-#                 sleep(2)
-
-#                 complete_form(
-#                     first_name="Pedro",
-#                     last_name="Pablo",
-#                     contact_email="pedro@testeo.com",
-#                     question="test2 jaolsa",
-#                 )
-#                 driver.back()
-#                 driver.back()
-#             else:
-#                 asking_button = WebDriverWait(driver, 30).until(
-#                     EC.presence_of_element_located(
-#                         (
-#                             By.XPATH,
-#                             "//form//input[@type='submit' and @value='Preguntar']",
-#                         )
-#                     )
-#                 )
-#                 asking_button.click()
-
-#                 sleep(10)
-
-#                 driver.back()
-#                 print("Done")
-#                 sleep(5)
-
-#             sleep(3)
-
-#         except Exception as e:
-#             break
-#     else:
-#         print("Done")
-#         break
-# def complete_form(
-#     first_name="test5",
-#     last_name="test4",
-#     contact_email="test@test.com",
-#     phone_number="",
-#     question="some question",
-# ):
-#     """Autocomplete the form in the vehicule page.
-
-#     Args:
-#         first_name (str, optional): [description]. Defaults to "test5".
-#         last_name (str, optional): [description]. Defaults to "test4".
-#         contact_email (str, optional): [description]. Defaults to "test@test.com".
-#         phone_number (str, optional): [description]. Defaults to "".
-#         question (str, optional): [description]. Defaults to "some question".
-#     """
-#     input_first_name = WebDriverWait(driver, 10).until(
-#         EC.presence_of_element_located((By.NAME, "firstName"))
-#     )
-#     input_first_name.send_keys(first_name)
-
-#     input_last_name = WebDriverWait(driver, 10).until(
-#         EC.presence_of_element_located((By.NAME, "lastName"))
-#     )
-#     input_last_name.send_keys(last_name)
-
-#     input_contact_email = WebDriverWait(driver, 10).until(
-#         EC.presence_of_element_located((By.NAME, "contactEmail"))
-#     )
-#     input_contact_email.send_keys(contact_email)
-
-#     input_phone_number = WebDriverWait(driver, 10).until(
-#         EC.presence_of_element_located((By.NAME, "phoneNumber"))
-#     )
-#     input_phone_number.send_keys(phone_number)
-
-#     input_question = WebDriverWait(driver, 10).until(
-#         EC.presence_of_element_located((By.NAME, "question"))
-#     )
-#     input_question.send_keys(question)
-
-#     asking_button = WebDriverWait(driver, 20).until(
-#         EC.presence_of_element_located(
-#             (By.XPATH, "//form//input[@type='submit' and @value='Preguntar']")
-#         )
-#     )
-#     asking_button.click()
-
-#     sleep(10)
+form_ml.send_multiple_forms()
 
 # htmls = []
 
